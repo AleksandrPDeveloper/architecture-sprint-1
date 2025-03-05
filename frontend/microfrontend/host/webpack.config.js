@@ -35,6 +35,11 @@ module.exports = {
           loader: "babel-loader",
         },
       },
+
+      {
+        test: /\.(svg|png|jpg)$/,
+        type: "asset",
+      },
     ],
   },
 
