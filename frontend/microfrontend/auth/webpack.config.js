@@ -35,6 +35,11 @@ module.exports = {
           loader: "babel-loader",
         },
       },
+
+      {
+        test: /\.(svg|png|jpg)$/,
+        type: "asset",
+      },
     ],
   },
 
@@ -43,7 +48,9 @@ module.exports = {
       name: "auth",
       filename: "remoteEntry.js",
       remotes: {},
-      exposes: {},
+      exposes: {
+        './Header': './src/components/Header.js',
+      },
       shared: {
         ...deps,
         react: {
