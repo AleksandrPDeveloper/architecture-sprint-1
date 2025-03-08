@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import '../blocks/profile/profile.css'
 import api from "../utils/api";
 import {useCurrentUserContext } from 'context/CurrentUserContext';
 
