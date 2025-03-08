@@ -3,13 +3,9 @@ import ReactDOM from "react-dom";
 import './index.css';
 import { Route, Switch, useHistory } from "react-router-dom"; // Add useHistory
 import api from "./utils/api";
-import * as auth from "./utils/auth";
 import { CurrentUserContext } from "./contexts/CurrentUserContext";
-import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Main from "./components/Main";
-import Register from "./components/Register";
-import Login from "./components/Login";
 import Footer from "./components/Footer";
 import EditProfilePopup from "./components/EditProfilePopup";
 import AddPlacePopup from "./components/AddPlacePopup";
@@ -18,6 +14,17 @@ import EditAvatarPopup from "./components/EditAvatarPopup";
 import ImagePopup from "./components/ImagePopup";
 import InfoTooltip from "./components/InfoTooltip";
 import { BrowserRouter } from "react-router-dom";
+
+
+const Header = lazy(() => import('auth/Header').catch(() => {
+    return { default: () => <div className='error'>Component Header is not available!</div> };
+}));
+const Login = lazy(() => import('auth/Login').catch(() => {
+    return { default: () => <div className='error'>Component Login is not available!</div> };
+}));
+const Register = lazy(() => import('auth/Register').catch(() => {
+    return { default: () => <div className='error'>Component Register is not available!</div> };
+}));
 
 const App = () => {
     const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
@@ -29,8 +36,6 @@ const App = () => {
     const [isInfoToolTipOpen, setIsInfoToolTipOpen] = useState(false);
     const [tooltipStatus, setTooltipStatus] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [email, setEmail] = useState("");
-    const history = useHistory();
 
     // Fetch app info on mount
     useEffect(() => {
@@ -42,24 +47,6 @@ const App = () => {
             })
             .catch((err) => console.log(err));
     }, []);
-
-    // Check token on mount
-    useEffect(() => {
-        const token = localStorage.getItem("jwt");
-        if (token) {
-            auth
-                .checkToken(token)
-                .then((res) => {
-                    setEmail(res.data.email);
-                    setIsLoggedIn(true);
-                    history.push("/");
-                })
-                .catch((err) => {
-                    localStorage.removeItem("jwt");
-                    console.log(err);
-                });
-        }
-    }, [history]);
 
     // Event handlers
     function handleEditProfileClick() {
@@ -137,45 +124,14 @@ const App = () => {
             .catch((err) => console.log(err));
     }
 
-    function onRegister({ email, password }) {
-        auth
-            .register(email, password)
-            .then((res) => {
-                setTooltipStatus("success");
-                setIsInfoToolTipOpen(true);
-                history.push("/signin");
-            })
-            .catch((err) => {
-                setTooltipStatus("fail");
-                setIsInfoToolTipOpen(true);
-            });
-    }
-
-    function onLogin({ email, password }) {
-        auth
-            .login(email, password)
-            .then((res) => {
-                setIsLoggedIn(true);
-                setEmail(email);
-                history.push("/");
-            })
-            .catch((err) => {
-                setTooltipStatus("fail");
-                setIsInfoToolTipOpen(true);
-            });
-    }
-
-    function onSignOut() {
-        localStorage.removeItem("jwt");
-        setIsLoggedIn(false);
-        history.push("/signin");
-    }
-
     return (
         // <div className="container">
             <CurrentUserContext.Provider value={currentUser}>
                 <div className="page__content">
-                    <Header email={email} onSignOut={onSignOut} />
+                    <Suspense fallback={<div>Loading Header...</div>}>
+                        <Header setIsLoggedIn={setIsLoggedIn}
+                        />
+                    </Suspense>
                     <Switch>
                         <ProtectedRoute
                             exact
@@ -191,10 +147,17 @@ const App = () => {
                             loggedIn={isLoggedIn}
                         />
                         <Route path="/signup">
-                            <Register onRegister={onRegister} />
+                            <Suspense fallback={<div>Loading Register...</div>}>
+                                <Register setTooltipStatus={setTooltipStatus}
+                                          setIsInfoToolTipOpen={setIsInfoToolTipOpen}/>
+                            </Suspense>
                         </Route>
                         <Route path="/signin">
-                            <Login onLogin={onLogin} />
+                            <Suspense fallback={<div>Loading Login...</div>}>
+                                <Login setIsLoggedIn={setIsLoggedIn}
+                                       setTooltipStatus={setTooltipStatus}
+                                       setIsInfoToolTipOpen={setIsInfoToolTipOpen}/>
+                            </Suspense>
                         </Route>
                     </Switch>
                     <Footer />

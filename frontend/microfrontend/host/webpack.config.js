@@ -61,6 +61,10 @@ module.exports = {
           singleton: true,
           requiredVersion: deps["react-dom"],
         },
+        "react-router-dom": {
+          singleton: true,
+          requiredVersion: "^5.2.0"
+        },
       },
     }),
     new HtmlWebPackPlugin({
