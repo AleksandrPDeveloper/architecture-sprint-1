@@ -42,8 +42,14 @@ module.exports = {
     new ModuleFederationPlugin({
       name: "profile",
       filename: "remoteEntry.js",
-      remotes: {},
-      exposes: {},
+      remotes: {
+        'context': 'context@http://localhost:3040/remoteEntry.js',
+      },
+      exposes: {
+        './EditAvatarPopup': './src/components/EditAvatarPopup.js',
+        './EditProfilePopup': './src/components/EditProfilePopup.js',
+        './ProfileInfo': './src/components/ProfileInfo.js',
+      },
       shared: {
         ...deps,
         react: {
@@ -53,6 +59,10 @@ module.exports = {
         "react-dom": {
           singleton: true,
           requiredVersion: deps["react-dom"],
+        },
+        "react-router-dom": {
+          singleton: true,
+          requiredVersion: "^5.2.0"
         },
       },
     }),
