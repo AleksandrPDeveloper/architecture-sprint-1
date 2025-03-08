@@ -50,6 +50,8 @@ module.exports = {
       remotes: {},
       exposes: {
         './Header': './src/components/Header.js',
+        './Login': './src/components/Login.js',
+        './Register': './src/components/Register.js',
       },
       shared: {
         ...deps,
@@ -60,6 +62,10 @@ module.exports = {
         "react-dom": {
           singleton: true,
           requiredVersion: deps["react-dom"],
+        },
+        "react-router-dom": {
+          singleton: true,
+          requiredVersion: "^5.2.0"
         },
       },
     }),

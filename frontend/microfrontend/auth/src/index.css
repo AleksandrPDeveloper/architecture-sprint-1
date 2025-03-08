@@ -1,3 +1,7 @@
+@import url('./blocks/header/header.css');
+@import url('./blocks/auth-form/auth-form.css');
+@import url('./blocks/page/page.css');
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
