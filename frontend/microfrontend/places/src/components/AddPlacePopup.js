@@ -1,22 +1,17 @@
-import React, {lazy} from 'react';
-import {useCurrentUserContext } from 'context/CurrentUserContext';
+import React, {lazy, Suspense, useState, useEffect} from "react";
+import { useCurrentUserContext } from 'context/CurrentUserContext';
 import api from "../utils/api";
 
-const PopupWithForm = lazy(() => import('context/PopupWithForm').catch(() => {
-  return { default: () => <div className='error'>Component PopupWithForm is not available!</div> };
-}));
 
-function Suspense(props) {
-  return null;
-}
 
 export default function AddPlacePopup() {
+  const PopupWithForm = lazy(() => import('context/PopupWithForm').catch(() => {
+    return { default: () => <div className='error'>Component PopupWithForm is not available!</div> };
+  }));
+
   const [name, setName] = React.useState('');
   const [link, setLink] = React.useState('');
-
   const { setCards, setIsAddPlacePopupOpen, setSelectedCard, cards, isAddPlacePopupOpen} = useCurrentUserContext();
-
-
 
   function handleNameChange(e) {
     setName(e.target.value);
