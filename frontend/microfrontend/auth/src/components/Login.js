@@ -3,12 +3,14 @@ import { useHistory } from 'react-router-dom';
 import '../blocks/login/login.css';
 import '../blocks/auth-form/auth-form.css';
 import * as auth from "../utils/auth";
+import { useCurrentUserContext } from "context/CurrentUserContext";
 
 
-function Login ({ setIsLoggedIn, setTooltipStatus, setIsInfoToolTipOpen}){
+function Login (){
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const history = useHistory();
+  const {setIsLoggedIn, setTooltipStatus, setIsInfoToolTipOpen} = useCurrentUserContext();
 
   function onLogin({ email, password }) {
     auth
