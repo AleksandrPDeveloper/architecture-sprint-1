@@ -3,17 +3,18 @@ import ReactDOM from "react-dom";
 import './index.css';
 import { Route, Switch, useHistory } from "react-router-dom"; // Add useHistory
 import api from "./utils/api";
-import { CurrentUserContext } from "./contexts/CurrentUserContext";
+import { CurrentUserContextProvider } from "context/CurrentUserContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Main from "./components/Main";
 import Footer from "./components/Footer";
-import EditProfilePopup from "./components/EditProfilePopup";
+
 import AddPlacePopup from "./components/AddPlacePopup";
-import PopupWithForm from "./components/PopupWithForm";
-import EditAvatarPopup from "./components/EditAvatarPopup";
+
+
 import ImagePopup from "./components/ImagePopup";
-import InfoTooltip from "./components/InfoTooltip";
+// import InfoTooltip from "./components/InfoTooltip";
 import { BrowserRouter } from "react-router-dom";
+// import PopupWithForm from "./components/PopupWithForm";
 
 
 const Header = lazy(() => import('auth/Header').catch(() => {
@@ -25,6 +26,15 @@ const Login = lazy(() => import('auth/Login').catch(() => {
 const Register = lazy(() => import('auth/Register').catch(() => {
     return { default: () => <div className='error'>Component Register is not available!</div> };
 }));
+const EditAvatarPopup = lazy(() => import('profile/EditAvatarPopup').catch(() => {
+    return { default: () => <div className='error'>Component EditAvatarPopup is not available!</div> };
+}));
+const EditProfilePopup = lazy(() => import('profile/EditProfilePopup').catch(() => {
+    return { default: () => <div className='error'>Component EditProfilePopup is not available!</div> };
+}));
+// const InfoTooltip = lazy(() => import('auth/InfoTooltip').catch(() => {
+//     return { default: () => <div className='error'>Component InfoTooltip is not available!</div> };
+// }));
 
 const App = () => {
     const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
@@ -126,7 +136,8 @@ const App = () => {
 
     return (
         // <div className="container">
-            <CurrentUserContext.Provider value={currentUser}>
+
+            <CurrentUserContextProvider>
                 <div className="page__content">
                     <Suspense fallback={<div>Loading Header...</div>}>
                         <Header setIsLoggedIn={setIsLoggedIn}
@@ -161,30 +172,34 @@ const App = () => {
                         </Route>
                     </Switch>
                     <Footer />
-                    <EditProfilePopup
-                        isOpen={isEditProfilePopupOpen}
-                        onUpdateUser={handleUpdateUser}
-                        onClose={closeAllPopups}
-                    />
+                    <Suspense fallback={<div>Loading EditProfilePopup...</div>}>
+                        <EditProfilePopup
+                            isOpen={isEditProfilePopupOpen}
+                            onClose={closeAllPopups}
+                        />
+                    </Suspense>
                     <AddPlacePopup
                         isOpen={isAddPlacePopupOpen}
                         onAddPlace={handleAddPlaceSubmit}
                         onClose={closeAllPopups}
                     />
-                    <PopupWithForm title="Вы уверены?" name="remove-card" buttonText="Да" />
-                    <EditAvatarPopup
-                        isOpen={isEditAvatarPopupOpen}
-                        onUpdateAvatar={handleUpdateAvatar}
-                        onClose={closeAllPopups}
-                    />
-                    <ImagePopup card={selectedCard} onClose={closeAllPopups} />
-                    <InfoTooltip
-                        isOpen={isInfoToolTipOpen}
-                        onClose={closeAllPopups}
-                        status={tooltipStatus}
-                    />
+                    {/*<PopupWithForm title="Вы уверены?" name="remove-card" buttonText="Да"/>*/}
+                    <Suspense fallback={<div>Loading EditAvatarPopup...</div>}>
+                        <EditAvatarPopup
+                            isOpen={isEditAvatarPopupOpen}
+                            onClose={closeAllPopups}
+                        />
+                    </Suspense>
+                    <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
+                    {/*<Suspense fallback={<div>Loading InfoTooltip...</div>}>*/}
+                    {/*    <InfoTooltip*/}
+                    {/*        isOpen={isInfoToolTipOpen}*/}
+                    {/*        onClose={closeAllPopups}*/}
+                    {/*        status={tooltipStatus}*/}
+                    {/*    />*/}
+                    {/*</Suspense>*/}
                 </div>
-            </CurrentUserContext.Provider>
+            </CurrentUserContextProvider>
         // </div>
     );
 };
