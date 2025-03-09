@@ -12,7 +12,6 @@ import AddPlacePopup from "./components/AddPlacePopup";
 
 
 import ImagePopup from "./components/ImagePopup";
-// import InfoTooltip from "./components/InfoTooltip";
 import { BrowserRouter } from "react-router-dom";
 // import PopupWithForm from "./components/PopupWithForm";
 
@@ -32,9 +31,9 @@ const EditAvatarPopup = lazy(() => import('profile/EditAvatarPopup').catch(() =>
 const EditProfilePopup = lazy(() => import('profile/EditProfilePopup').catch(() => {
     return { default: () => <div className='error'>Component EditProfilePopup is not available!</div> };
 }));
-// const InfoTooltip = lazy(() => import('auth/InfoTooltip').catch(() => {
-//     return { default: () => <div className='error'>Component InfoTooltip is not available!</div> };
-// }));
+const InfoTooltip = lazy(() => import('auth/InfoTooltip').catch(() => {
+    return { default: () => <div className='error'>Component InfoTooltip is not available!</div> };
+}));
 
 const App = () => {
     const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
@@ -191,13 +190,13 @@ const App = () => {
                         />
                     </Suspense>
                     <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
-                    {/*<Suspense fallback={<div>Loading InfoTooltip...</div>}>*/}
-                    {/*    <InfoTooltip*/}
-                    {/*        isOpen={isInfoToolTipOpen}*/}
-                    {/*        onClose={closeAllPopups}*/}
-                    {/*        status={tooltipStatus}*/}
-                    {/*    />*/}
-                    {/*</Suspense>*/}
+                    <Suspense fallback={<div>Loading InfoTooltip...</div>}>
+                        <InfoTooltip
+                            isOpen={isInfoToolTipOpen}
+                            onClose={closeAllPopups}
+                            status={tooltipStatus}
+                        />
+                    </Suspense>
                 </div>
             </CurrentUserContextProvider>
         // </div>
