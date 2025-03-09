@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useHistory} from 'react-router-dom';
 import * as auth from "../utils/auth";
 import '../blocks/auth-form/auth-form.css';
+import { useCurrentUserContext } from "context/CurrentUserContext";
 
-function Register ({ setTooltipStatus, setIsInfoToolTipOpen }){
+function Register (){
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const history = useHistory();
+
+  const {setTooltipStatus, setIsInfoToolTipOpen} = useCurrentUserContext();
 
   function onRegister({ email, password }) {
     auth

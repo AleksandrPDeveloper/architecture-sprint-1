@@ -4,9 +4,11 @@ import logoPath from '../images/logo.svg';
 import '../blocks/header/header.css';
 import * as auth from "../utils/auth";
 import '../blocks/page/__section/page__section.css'
+import { useCurrentUserContext } from "context/CurrentUserContext";
 
 // В корневом компоненте App описаны обработчики: onRegister, onLogin и onSignOut. Эти обработчики переданы в соответствующие компоненты: Register.js, Login.js, Header.js
-export default function Header({setIsLoggedIn}) {
+export default function Header({}) {
+    const {setIsLoggedIn} = useCurrentUserContext();
     const history = useHistory();
     const [email, setEmail] = useState("");
     function onSignOut() {

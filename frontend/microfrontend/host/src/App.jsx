@@ -4,6 +4,7 @@ import './index.css';
 import { Route, Switch, useHistory } from "react-router-dom"; // Add useHistory
 import api from "./utils/api";
 import { CurrentUserContextProvider } from "context/CurrentUserContext";
+import { useCurrentUserContext } from "context/CurrentUserContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Main from "./components/Main";
 import Footer from "./components/Footer";
@@ -36,15 +37,26 @@ const InfoTooltip = lazy(() => import('auth/InfoTooltip').catch(() => {
 }));
 
 const App = () => {
-    const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
-    const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
-    const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
-    const [selectedCard, setSelectedCard] = useState(null);
-    const [cards, setCards] = useState([]);
-    const [currentUser, setCurrentUser] = useState({});
-    const [isInfoToolTipOpen, setIsInfoToolTipOpen] = useState(false);
-    const [tooltipStatus, setTooltipStatus] = useState("");
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const {
+        currentUser,
+            setCurrentUser,
+            isEditProfilePopupOpen,
+            setIsEditProfilePopupOpen,
+            isEditAvatarPopupOpen,
+            setIsEditAvatarPopupOpen,
+            isAddPlacePopupOpen,
+            setIsAddPlacePopupOpen,
+            selectedCard,
+            setSelectedCard,
+            cards,
+            setCards,
+            isInfoToolTipOpen,
+            setIsInfoToolTipOpen,
+            tooltipStatus,
+            setTooltipStatus,
+            isLoggedIn,
+            setIsLoggedIn
+    } = useCurrentUserContext();
 
     // Fetch app info on mount
     useEffect(() => {
@@ -80,26 +92,6 @@ const App = () => {
 
     function handleCardClick(card) {
         setSelectedCard(card);
-    }
-
-    function handleUpdateUser(userUpdate) {
-        api
-            .setUserInfo(userUpdate)
-            .then((newUserData) => {
-                setCurrentUser(newUserData);
-                closeAllPopups();
-            })
-            .catch((err) => console.log(err));
-    }
-
-    function handleUpdateAvatar(avatarUpdate) {
-        api
-            .setUserAvatar(avatarUpdate)
-            .then((newUserData) => {
-                setCurrentUser(newUserData);
-                closeAllPopups();
-            })
-            .catch((err) => console.log(err));
     }
 
     function handleCardLike(card) {
@@ -139,8 +131,7 @@ const App = () => {
             <CurrentUserContextProvider>
                 <div className="page__content">
                     <Suspense fallback={<div>Loading Header...</div>}>
-                        <Header setIsLoggedIn={setIsLoggedIn}
-                        />
+                        <Header/>
                     </Suspense>
                     <Switch>
                         <ProtectedRoute
@@ -154,19 +145,16 @@ const App = () => {
                             onCardClick={handleCardClick}
                             onCardLike={handleCardLike}
                             onCardDelete={handleCardDelete}
-                            loggedIn={isLoggedIn}
+                            loggedIn={() =>isLoggedIn}
                         />
                         <Route path="/signup">
                             <Suspense fallback={<div>Loading Register...</div>}>
-                                <Register setTooltipStatus={setTooltipStatus}
-                                          setIsInfoToolTipOpen={setIsInfoToolTipOpen}/>
+                                <Register/>
                             </Suspense>
                         </Route>
                         <Route path="/signin">
                             <Suspense fallback={<div>Loading Login...</div>}>
-                                <Login setIsLoggedIn={setIsLoggedIn}
-                                       setTooltipStatus={setTooltipStatus}
-                                       setIsInfoToolTipOpen={setIsInfoToolTipOpen}/>
+                                <Login />
                             </Suspense>
                         </Route>
                     </Switch>
@@ -191,11 +179,7 @@ const App = () => {
                     </Suspense>
                     <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
                     <Suspense fallback={<div>Loading InfoTooltip...</div>}>
-                        <InfoTooltip
-                            isOpen={isInfoToolTipOpen}
-                            onClose={closeAllPopups}
-                            status={tooltipStatus}
-                        />
+                        <InfoTooltip/>
                     </Suspense>
                 </div>
             </CurrentUserContextProvider>
