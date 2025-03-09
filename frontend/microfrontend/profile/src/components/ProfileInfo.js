@@ -3,13 +3,14 @@ import '../blocks/profile/profile.css'
 import api from "../utils/api";
 import {useCurrentUserContext } from 'context/CurrentUserContext';
 
-export default function ProfileInfo({onAddPlace}) {
+export default function ProfileInfo() {
 
     const {
         currentUser,
         setCurrentUser,
         setIsEditProfilePopupOpen,
-        setIsEditAvatarPopupOpen} = useCurrentUserContext()
+        setIsEditAvatarPopupOpen,
+        setIsAddPlacePopupOpen} = useCurrentUserContext();
     const imageStyle = { backgroundImage: `url(${currentUser.avatar})` };
 
     function handleEditAvatarClick() {
@@ -18,6 +19,10 @@ export default function ProfileInfo({onAddPlace}) {
 
     function handleEditProfileClick() {
         setIsEditProfilePopupOpen(true);
+    }
+
+    function handleAddPlaceClick() {
+        setIsAddPlacePopupOpen(true);
     }
 
     useEffect(() => {
@@ -37,6 +42,6 @@ export default function ProfileInfo({onAddPlace}) {
                 <button className="profile__edit-button" type="button" onClick={handleEditProfileClick}></button>
                 <p className="profile__description">{currentUser.about}</p>
             </div>
-            <button className="profile__add-button" type="button" onClick={onAddPlace}></button>
+            <button className="profile__add-button" type="button" onClick={handleAddPlaceClick}></button>
         </section>);
 }

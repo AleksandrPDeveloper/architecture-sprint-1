@@ -2,19 +2,16 @@ import React, { lazy, Suspense, useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import './index.css';
 import { Route, Switch, useHistory } from "react-router-dom"; // Add useHistory
-import api from "./utils/api";
 import { CurrentUserContextProvider } from "context/CurrentUserContext";
 import { useCurrentUserContext } from "context/CurrentUserContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Main from "./components/Main";
 import Footer from "./components/Footer";
 
-import AddPlacePopup from "./components/AddPlacePopup";
 
 
-import ImagePopup from "./components/ImagePopup";
 import { BrowserRouter } from "react-router-dom";
-// import PopupWithForm from "./components/PopupWithForm";
+
 
 
 const Header = lazy(() => import('auth/Header').catch(() => {
@@ -35,99 +32,22 @@ const EditProfilePopup = lazy(() => import('profile/EditProfilePopup').catch(() 
 const InfoTooltip = lazy(() => import('auth/InfoTooltip').catch(() => {
     return { default: () => <div className='error'>Component InfoTooltip is not available!</div> };
 }));
+const ImagePopup = lazy(() => import('places/ImagePopup').catch(() => {
+    return { default: () => <div className='error'>Component ImagePopup is not available!</div> };
+}));
+const PopupWithForm = lazy(() => import('context/PopupWithForm').catch(() => {
+    return { default: () => <div className='error'>Component PopupWithForm is not available!</div> };
+}));
+const AddPlacePopup = lazy(() => import('places/AddPlacePopup').catch(() => {
+    return { default: () => <div className='error'>Component AddPlacePopup is not available!</div> };
+}));
 
 const App = () => {
-    const {
-        currentUser,
-            setCurrentUser,
-            isEditProfilePopupOpen,
-            setIsEditProfilePopupOpen,
-            isEditAvatarPopupOpen,
-            setIsEditAvatarPopupOpen,
-            isAddPlacePopupOpen,
-            setIsAddPlacePopupOpen,
-            selectedCard,
-            setSelectedCard,
-            cards,
-            setCards,
-            isInfoToolTipOpen,
-            setIsInfoToolTipOpen,
-            tooltipStatus,
-            setTooltipStatus,
-            isLoggedIn,
-            setIsLoggedIn
-    } = useCurrentUserContext();
 
-    // Fetch app info on mount
-    useEffect(() => {
-        api
-            .getAppInfo()
-            .then(([cardData, userData]) => {
-                setCurrentUser(userData);
-                setCards(cardData);
-            })
-            .catch((err) => console.log(err));
-    }, []);
-
-    // Event handlers
-    function handleEditProfileClick() {
-        setIsEditProfilePopupOpen(true);
-    }
-
-    function handleAddPlaceClick() {
-        setIsAddPlacePopupOpen(true);
-    }
-
-    function handleEditAvatarClick() {
-        setIsEditAvatarPopupOpen(true);
-    }
-
-    function closeAllPopups() {
-        setIsEditProfilePopupOpen(false);
-        setIsAddPlacePopupOpen(false);
-        setIsEditAvatarPopupOpen(false);
-        setIsInfoToolTipOpen(false);
-        setSelectedCard(null);
-    }
-
-    function handleCardClick(card) {
-        setSelectedCard(card);
-    }
-
-    function handleCardLike(card) {
-        const isLiked = card.likes.some((i) => i._id === currentUser._id);
-        api
-            .changeLikeCardStatus(card._id, !isLiked)
-            .then((newCard) => {
-                setCards((cards) =>
-                    cards.map((c) => (c._id === card._id ? newCard : c))
-                );
-            })
-            .catch((err) => console.log(err));
-    }
-
-    function handleCardDelete(card) {
-        api
-            .removeCard(card._id)
-            .then(() => {
-                setCards((cards) => cards.filter((c) => c._id !== card._id));
-            })
-            .catch((err) => console.log(err));
-    }
-
-    function handleAddPlaceSubmit(newCard) {
-        api
-            .addCard(newCard)
-            .then((newCardFull) => {
-                setCards([newCardFull, ...cards]);
-                closeAllPopups();
-            })
-            .catch((err) => console.log(err));
-    }
+    const { isLoggedIn } = useCurrentUserContext();
 
     return (
         // <div className="container">
-
             <CurrentUserContextProvider>
                 <div className="page__content">
                     <Suspense fallback={<div>Loading Header...</div>}>
@@ -138,13 +58,6 @@ const App = () => {
                             exact
                             path="/"
                             component={Main}
-                            cards={cards}
-                            onEditProfile={handleEditProfileClick}
-                            onAddPlace={handleAddPlaceClick}
-                            onEditAvatar={handleEditAvatarClick}
-                            onCardClick={handleCardClick}
-                            onCardLike={handleCardLike}
-                            onCardDelete={handleCardDelete}
                             loggedIn={() =>isLoggedIn}
                         />
                         <Route path="/signup">
@@ -160,24 +73,20 @@ const App = () => {
                     </Switch>
                     <Footer />
                     <Suspense fallback={<div>Loading EditProfilePopup...</div>}>
-                        <EditProfilePopup
-                            isOpen={isEditProfilePopupOpen}
-                            onClose={closeAllPopups}
-                        />
+                        <EditProfilePopup/>
                     </Suspense>
-                    <AddPlacePopup
-                        isOpen={isAddPlacePopupOpen}
-                        onAddPlace={handleAddPlaceSubmit}
-                        onClose={closeAllPopups}
-                    />
-                    {/*<PopupWithForm title="Вы уверены?" name="remove-card" buttonText="Да"/>*/}
+                    <Suspense fallback={<div>Loading AddPlacePopup...</div>}>
+                        <AddPlacePopup/>
+                    </Suspense>
+                    <Suspense fallback={<div>Loading PopupWithForm...</div>}>
+                        <PopupWithForm title="Вы уверены?" name="remove-card" buttonText="Да"/>
+                    </Suspense>
                     <Suspense fallback={<div>Loading EditAvatarPopup...</div>}>
-                        <EditAvatarPopup
-                            isOpen={isEditAvatarPopupOpen}
-                            onClose={closeAllPopups}
-                        />
+                        <EditAvatarPopup/>
                     </Suspense>
-                    <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
+                    <Suspense fallback={<div>Loading ImagePopup...</div>}>
+                        <ImagePopup/>
+                    </Suspense>
                     <Suspense fallback={<div>Loading InfoTooltip...</div>}>
                         <InfoTooltip/>
                     </Suspense>

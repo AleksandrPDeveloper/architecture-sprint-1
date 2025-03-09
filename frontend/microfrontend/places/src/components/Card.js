@@ -1,8 +1,9 @@
 import React from 'react';
-// import { CurrentUserContext } from '../contexts/CurrentUserContext';
-import { useCurrentUserContext } from "context/CurrentUserContext";
 
-function Card({ card, onCardClick, onCardLike, onCardDelete }) {
+import { useCurrentUserContext } from "context/CurrentUserContext";
+import api from "../utils/api";
+
+export default function Card({ card }) {
   const cardStyle = { backgroundImage: `url(${card.link})` };
 
   function handleClick() {
@@ -17,7 +18,7 @@ function Card({ card, onCardClick, onCardLike, onCardDelete }) {
     onCardDelete(card);
   }
 
-  const currentUser = useCurrentUserContext();
+  const { currentUser, setSelectedCard, setCards } = useCurrentUserContext();
 
   const isLiked = card.likes.some(i => i._id === currentUser._id);
   const cardLikeButtonClassName = `card__like-button ${isLiked && 'card__like-button_is-active'}`;
@@ -26,6 +27,31 @@ function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   const cardDeleteButtonClassName = (
     `card__delete-button ${isOwn ? 'card__delete-button_visible' : 'card__delete-button_hidden'}`
   );
+
+  function onCardClick(card) {
+    setSelectedCard(card);
+  }
+
+  function onCardLike(card) {
+    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+    api
+        .changeLikeCardStatus(card._id, !isLiked)
+        .then((newCard) => {
+          setCards((cards) =>
+              cards.map((c) => (c._id === card._id ? newCard : c))
+          );
+        })
+        .catch((err) => console.log(err));
+  }
+
+  function onCardDelete(card) {
+    api
+        .removeCard(card._id)
+        .then(() => {
+          setCards((cards) => cards.filter((c) => c._id !== card._id));
+        })
+        .catch((err) => console.log(err));
+  }
 
   return (
     <li className="places__item card">
@@ -44,5 +70,3 @@ function Card({ card, onCardClick, onCardLike, onCardDelete }) {
     </li>
   );
 }
-
-export default Card;

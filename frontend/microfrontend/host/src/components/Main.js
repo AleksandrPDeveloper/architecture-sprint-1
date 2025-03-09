@@ -1,30 +1,22 @@
 import React, {lazy, Suspense} from 'react';
-import Card from './Card';
 
 const ProfileInfo = lazy(() => import('profile/ProfileInfo').catch(() => {
     return { default: () => <div className='error'>Component ProfileInfo is not available!</div> };
 }));
 
-function Main({ cards, onAddPlace, onCardClick, onCardLike, onCardDelete }) {
+const Places = lazy(() => import('places/Places').catch(() => {
+    return { default: () => <div className='error'>Component Places is not available!</div> };
+}));
 
+function Main() {
   return (
       <main className="content">
           <Suspense fallback={<div>Loading ProfileInfo...</div>}>
-              <ProfileInfo onAddPlace = {onAddPlace} />
+              <ProfileInfo/>
           </Suspense>
-          <section className="places page__section">
-              <ul className="places__list">
-                  {cards.map((card) => (
-                      <Card
-                          key={card._id}
-                          card={card}
-                          onCardClick={onCardClick}
-                          onCardLike={onCardLike}
-                          onCardDelete={onCardDelete}
-                      />
-                  ))}
-              </ul>
-          </section>
+          <Suspense fallback={<div>Loading ProfileInfo...</div>}>
+              <Places/>
+          </Suspense>
       </main>
   );
 }

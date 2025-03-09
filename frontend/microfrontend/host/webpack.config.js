@@ -49,6 +49,7 @@ module.exports = {
       filename: "remoteEntry.js",
       remotes: {
         'auth': 'auth@http://localhost:3010/remoteEntry.js',
+        'places': 'places@http://localhost:3030/remoteEntry.js',
         'profile': 'profile@http://localhost:3020/remoteEntry.js',
         'context': 'context@http://localhost:3040/remoteEntry.js',
       },

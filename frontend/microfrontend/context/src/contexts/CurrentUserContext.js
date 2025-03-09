@@ -3,8 +3,9 @@ import { createContext, useState, useContext } from 'react';
 
 const CurrentUserContext = React.createContext({
     currentUser: {},
-    cards: [],
-
+    // setCurrentUser: () => {},
+    // cards: [],
+    // setCards: () => {},
 });
 
 export const CurrentUserContextProvider = ({ children }) => {
