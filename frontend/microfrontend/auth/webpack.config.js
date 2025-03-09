@@ -47,11 +47,14 @@ module.exports = {
     new ModuleFederationPlugin({
       name: "auth",
       filename: "remoteEntry.js",
-      remotes: {},
+      remotes: {
+        'context': 'context@http://localhost:3040/remoteEntry.js',
+      },
       exposes: {
         './Header': './src/components/Header.js',
         './Login': './src/components/Login.js',
         './Register': './src/components/Register.js',
+        './InfoTooltip': './src/components/InfoTooltip.js',
       },
       shared: {
         ...deps,
