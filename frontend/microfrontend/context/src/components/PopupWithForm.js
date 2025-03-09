@@ -1,6 +1,6 @@
 import React from 'react';
 
-function PopupWithForm({
+export default function PopupWithForm({
   title,
   name,
   isOpen,
@@ -22,5 +22,3 @@ function PopupWithForm({
     </div>
   );
 }
-
-export default PopupWithForm;

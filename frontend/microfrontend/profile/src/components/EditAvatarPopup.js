@@ -1,9 +1,11 @@
 import React, {lazy, Suspense, useState, useEffect} from "react";
-import PopupWithForm from './PopupWithForm';
 import api from "../utils/api";
 import {useCurrentUserContext } from 'context/CurrentUserContext';
 
 export default function EditAvatarPopup() {
+    const PopupWithForm = lazy(() => import('context/PopupWithForm').catch(() => {
+        return { default: () => <div className='error'>Component PopupWithForm is not available!</div> };
+    }));
     const inputRef = React.useRef();
     const {setCurrentUser, isEditAvatarPopupOpen, setIsEditAvatarPopupOpen} = useCurrentUserContext();
 
@@ -29,13 +31,18 @@ export default function EditAvatarPopup() {
             .catch((err) => console.log(err));
     }
 
-    return (<PopupWithForm
-            isOpen={isEditAvatarPopupOpen} onSubmit={handleSubmit} onClose={onClose} title="Обновить аватар" name="edit-avatar">
-            <label className="popup__label">
-                <input type="url" name="avatar" id="owner-avatar"
-                       className="popup__input popup__input_type_description" placeholder="Ссылка на изображение"
-                       required ref={inputRef}/>
-                <span className="popup__error" id="owner-avatar-error"></span>
-            </label>
-        </PopupWithForm>);
+    return (
+        <Suspense fallback={<div>Загрузка...</div>}>
+            <PopupWithForm
+                isOpen={isEditAvatarPopupOpen} onSubmit={handleSubmit} onClose={onClose} title="Обновить аватар"
+                name="edit-avatar">
+                <label className="popup__label">
+                    <input type="url" name="avatar" id="owner-avatar"
+                           className="popup__input popup__input_type_description" placeholder="Ссылка на изображение"
+                           required ref={inputRef}/>
+                    <span className="popup__error" id="owner-avatar-error"></span>
+                </label>
+            </PopupWithForm>
+        </Suspense>
+    );
 }

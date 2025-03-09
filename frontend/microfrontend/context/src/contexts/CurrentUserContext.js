@@ -4,7 +4,6 @@ import { createContext, useState, useContext } from 'react';
 const CurrentUserContext = React.createContext({
     currentUser: {},
     cards: [],
-    setTooltipStatus: ""
 
 });
 
