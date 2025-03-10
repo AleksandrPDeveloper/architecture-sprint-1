@@ -178,7 +178,8 @@ _setSelectedCard_.
 1. Создавать независимые приложения которые делятся своими ресурсами(remotes/exposes)
 2. Делится зависимостями, ресурсами чтобы не загружать лишний код на клиента.
 3. Управлять отдельно приложениями host/remotes(имею ввиду независимый деплой)
-4. Уменьшает начальную количество кода передаваемого клиенту за счет использования lazy load.
+4. Уменьшает начальное количество кода передаваемого клиенту за счет использования lazy load, однако код все так же мое
+   однако код все так же может перегружать клиента.
 
 К недостаткам можно отнести:
 1. Не умеет работать с разными фреймворками.
@@ -215,13 +216,127 @@ Module Federation уже внутри фреймворка одного фрей
 - модуль авторизации/регистрации(remotes)
 - модуль управления профилем(remotes)
 - модуль управления местами(remotes)
+- модуль управления контекстом и общими формами(remotes)
 - основное приложение(host)
 
-С таким подходом, я могу разбить проект на 4 микрофронтенда и запускать и управлять ими отдельно.
+С таким подходом, я могу разбить проект на 5 микрофронтенда и запускать и управлять ими отдельно.
 Необходимость загрузки компонентов настрою с помощью lazy load. Зависимости будут общие не будет 
 оверхэда(как это могло бы быть при Single SPA) передаваемых данных на клиента. 
 
 ### Уровень 2
 
+Я разделил фронтенд на модули отвечающие за свои функции:
 
+[auth](frontend/microfrontend/auth) модуль авторизации, включает в себя стили
+работы с Авторизацей/Регистрацией, компоненты:
+[Login.js](frontend/microfrontend/auth/src/components/Login.js) и [Register.js](frontend/microfrontend/auth/src/components/Register.js)
+так же в этот компонент забрал [Header.js](frontend/microfrontend/auth/src/components/Header.js)
+поскольку он как раз и взаимодействует с маршрутами регистрации и авторизации, и вообще проверки состояния авторизации. А так же делает выход.
+В этих же компонентах окно оповещения об ошибках и успехах регистрации/авторизации [InfoTooltip.js](frontend/microfrontend/auth/src/components/InfoTooltip.js)
+В этом модуле используется api для взаимодействия с бэкендом, касающееся авторизации 
+это функции регистрация, авторизация, валидация.
 
+[host](frontend/microfrontend/host) модуль работы с карточками включает в себя все взаимодействие с карточками.
+Загрузка списка, просмотр отдельной картинки, установка/снятие лайка, удаление и добавление.
+Включает в себя стили работы с местами и компоненты:
+[AddPlacePopup.js](frontend/microfrontend/places/src/components/AddPlacePopup.js) окно добавления нового места.
+[Card.js](frontend/microfrontend/places/src/components/Card.js) Работа с карточкой удление лайк просмотр.
+[ImagePopup.js](frontend/microfrontend/places/src/components/ImagePopup.js) Окно в котором открывается просмотр.
+[Places.js](frontend/microfrontend/places/src/components/Places.js) список всех мест.
+[api.js](frontend/microfrontend/places/src/utils/api.js) взаимодействие бэкендом, все что касается работы с карточками:
+загрузка списка, лак, добавление, удаление, просмотр.
+
+[profile](frontend/microfrontend/profile) модуль работы с профилем пользователя,
+обеспечивает просмотр профиля авторизованного пользователя, изменение аватара и информации о себе.
+включает в себя стили и компоненты:
+[ProfileInfo.js](frontend/microfrontend/profile/src/components/ProfileInfo.js) просмотр профиля.
+[EditProfilePopup.js](frontend/microfrontend/profile/src/components/EditProfilePopup.js) изменение профиля.
+[EditAvatarPopup.js](frontend/microfrontend/profile/src/components/EditAvatarPopup.js) изменение аватара.
+[api.js](frontend/microfrontend/profile/src/utils/api.js) взаимодействие бэкендом, все что касается работы с профилем:
+получение тек информации о пользователе, изменение аватара и текста профиля.
+
+[host](frontend/microfrontend/host) основное приложение к которому подключаются все перечисленные модули.
+По факту в этом модуле все что осталось это стили компоненты:
+[Footer.js](frontend/microfrontend/host/src/components/Footer.js) нижний колонтитул.
+[Main.js](frontend/microfrontend/host/src/components/Main.js) этот раздел разделился на 2 модуля на
+[Places.js](frontend/microfrontend/places/src/components/Places.js) и на [ProfileInfo.js](frontend/microfrontend/profile/src/components/ProfileInfo.js)
+[ProtectedRoute.js](frontend/microfrontend/host/src/components/ProtectedRoute.js) работа с маршрутами, в том числе защищенными и нет.
+В целом маршруты разбивают приложение на пути, либо в [Header.js](frontend/microfrontend/auth/src/components/Header.js)
+либо в [Header.js](frontend/microfrontend/auth/src/components/Header.js) и в [Main.js](frontend/microfrontend/host/src/components/Main.js).
+
+Следует отметить еще один служебный компонент:
+[context](frontend/microfrontend/context) в нем происходит управление состоянием 
+[CurrentUserContext.js](frontend/microfrontend/context/src/contexts/CurrentUserContext.js) и компонент общей формы
+[PopupWithForm.js](frontend/microfrontend/context/src/components/PopupWithForm.js)
+
+Логически, я конечно вынес это в отдельный компонент, но следует отметить, в этом случае, это зависимость,
+каждого модуля от этого компонента, и с ним что-то пойдёт не так, откажет работа состояний всей системы,
+возможно этот компонент, не нужно было выносить и оставить всю логику в [host](frontend/microfrontend/host)
+Но мне показалось что это концептуально, не верно, и логику работы с состоянием нужно вынести.
+Следует отметить, что в целом возможно, есть реализация передачи большого количества параметров и хуков,
+чтобы обойтись без общих состояний между модулями, так же отмечу что возможно было использовать какие-либо 
+библиотеки состояния для управления, взаимодействием между модулями. Я выбрал такой путь, потому что проект
+достаточно простой, и не хотелось его усложнять зависимостями, поэтому добавил свою маленькую.
+
+[CurrentUserContext.js](frontend/microfrontend/context/src/contexts/CurrentUserContext.js) вынос общего компонента в отдельный
+фронтенд тоже еще одна точка отказа, возможно имело место быть добавить эту форму в каждом проекте, однако я решил,
+что в любой момент во фронтендах можно отказаться от загрузки этой формы и перейти на свою.
+
+Таким образом фронтенд разбился на 5 маленьких:
+1. основной [host](frontend/microfrontend/host)
+2. служебный [context](frontend/microfrontend/context)
+3. работа с авторизацией [auth](frontend/microfrontend/auth) по соображениям безопасности следует от профиля.
+4. работа с местами [places](frontend/microfrontend/places)
+5. работа с профилем [profile](frontend/microfrontend/profile)
+
+### Уровень 3
+Запуск, нужно скачать папку [microfrontend](frontend/microfrontend) из удаленного репозитория, либо
+выкачать весь репозиторий и перейти в папку [microfrontend](frontend/microfrontend).
+
+Далее запустить поочереди микрофронтенды:
+
+Общий смысл такой сначала запустить [context](frontend/microfrontend/context)
+затем в любой последовательности 
+
+[auth](frontend/microfrontend/auth)
+
+[places](frontend/microfrontend/places)
+
+[profile](frontend/microfrontend/profile)
+
+В конце запустить основное приложение [host](frontend/microfrontend/host)
+
+Пример:
+
+1. ```cd context``` 
+
+   ```npm install```
+
+   ```npm start```
+
+2. ```cd auth```
+
+   ```npm install```
+
+   ```npm start```
+
+3. ```cd profile```
+
+   ```npm install```
+
+   ```npm start```
+
+4. ```cd places```
+
+   ```npm install```
+
+   ```npm start```
+
+5. ```cd host```
+
+   ```npm install```
+
+   ```npm start```
+
+PS: Никогда в жизни не работал с фронтендом. 
+Потратил очень много времени на запуск, основные мысли описал, код работает, времени переписать все заново нет, не судите строго;)
