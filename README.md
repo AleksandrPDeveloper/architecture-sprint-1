@@ -306,6 +306,10 @@ Module Federation уже внутри фреймворка одного фрей
 
 В конце запустить основное приложение [host](frontend/microfrontend/host)
 
+Запустить ```docker-compose up --build -d``` из корня проекта [microfrontend](frontend/microfrontend)
+
+или же руками
+
 Пример:
 
 1. ```cd context``` 
