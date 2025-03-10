@@ -2,10 +2,12 @@ import React, {lazy, Suspense, useState, useEffect} from "react";
 import api from "../utils/api";
 import {useCurrentUserContext } from 'context/CurrentUserContext';
 
+const PopupWithForm = lazy(() => import('context/PopupWithForm').catch(() => {
+    return { default: () => <div className='error'>Component PopupWithForm is not available!</div> };
+}));
+
 export default function EditAvatarPopup() {
-    const PopupWithForm = lazy(() => import('context/PopupWithForm').catch(() => {
-        return { default: () => <div className='error'>Component PopupWithForm is not available!</div> };
-    }));
+
     const inputRef = React.useRef();
     const {setCurrentUser, isEditAvatarPopupOpen, setIsEditAvatarPopupOpen} = useCurrentUserContext();
 

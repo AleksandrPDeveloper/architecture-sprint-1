@@ -2,14 +2,14 @@ import React, {lazy, Suspense, useState} from "react";
 import api from "../utils/api";
 import {useCurrentUserContext } from 'context/CurrentUserContext';
 
+const PopupWithForm = lazy(() => import('context/PopupWithForm').catch(() => {
+  return { default: () => <div className='error'>Component PopupWithForm is not available!</div> };
+}));
+
 export default function EditProfilePopup() {
   const [name, setName] = React.useState('');
   const [description, setDescription] = React.useState('');
   const {currentUser, setCurrentUser, isEditProfilePopupOpen, setIsEditProfilePopupOpen} = useCurrentUserContext();
-
-  const PopupWithForm = lazy(() => import('context/PopupWithForm').catch(() => {
-    return { default: () => <div className='error'>Component PopupWithForm is not available!</div> };
-  }));
 
   function handleNameChange(e) {
     setName(e.target.value);
