@@ -1,0 +1,78 @@
+services:
+
+  context:
+    build:
+      context: context
+      dockerfile: Dockerfile.сontext
+    ports:
+      - 3040:3040
+    healthcheck:
+      interval: 10s
+      timeout: 2s
+      start_period: 15s
+      retries: 5
+      test: node healthcheck.js
+
+  auth:
+    build:
+      context: auth
+      dockerfile: Dockerfile.auth
+    ports:
+      - 3010:3010
+    healthcheck:
+      interval: 10s
+      timeout: 2s
+      start_period: 15s
+      retries: 5
+      test: node healthcheck.js
+    depends_on:
+      context:
+        condition: service_healthy
+
+  places:
+    build:
+      context: places
+      dockerfile: Dockerfile.places
+    ports:
+      - 3030:3030
+    healthcheck:
+      interval: 10s
+      timeout: 2s
+      start_period: 15s
+      retries: 5
+      test: node healthcheck.js
+    depends_on:
+      context:
+        condition: service_healthy
+
+  profile:
+    build:
+      context: profile
+      dockerfile: Dockerfile.profile
+    ports:
+      - 3020:3020
+    healthcheck:
+      interval: 10s
+      timeout: 2s
+      start_period: 15s
+      retries: 5
+      test: node healthcheck.js
+    depends_on:
+      context:
+        condition: service_healthy
+
+  host:
+    build:
+      context: host
+      dockerfile: Dockerfile.host
+    ports:
+      - 3000:3000
+    depends_on:
+      context:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+      profile:
+        condition: service_healthy
+      places:
+        condition: service_healthy
